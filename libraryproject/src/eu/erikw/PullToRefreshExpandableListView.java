@@ -1,56 +1,32 @@
 package eu.erikw;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.*;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.view.animation.*;
-import android.view.animation.Animation.AnimationListener;
-import android.widget.*;
-
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import eu.erikw.PullToRefreshHelper.OnRefreshListener;
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.widget.ExpandableListView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
-/**
- * A generic, customizable Android ListView implementation that has 'Pull to Refresh' functionality.
- * <p/>
- * This ListView can be used in place of the normal Android android.widget.ListView class.
- * <p/>
- * Users of this class should implement OnRefreshListener and call setOnRefreshListener(..)
- * to get notified on refresh events. The using class should call onRefreshComplete() when
- * refreshing is finished.
- * <p/>
- * The using class can call setRefreshing() to set the state explicitly to refreshing. This
- * is useful when you want to show the spinner and 'Refreshing' text when the
- * refresh was not triggered by 'Pull to Refresh', for example on start.
- * <p/>
- * For more information, visit the project page:
- * https://github.com/erikwt/PullToRefresh-ListView
- *
- * @author Erik Wallentinsen <dev+ptr@erikw.eu>
- * @version 1.0.0
- */
-public class PullToRefreshListView extends ListView{
-
-    private PullToRefreshHelper ptrHelper;
-
-
-    public PullToRefreshListView(Context context){
+public class PullToRefreshExpandableListView extends ExpandableListView {
+	
+	PullToRefreshHelper ptrHelper;
+	
+	public PullToRefreshExpandableListView(Context context){
         super(context);
         ptrHelper = new PullToRefreshHelper(this);
         ptrHelper.init();
     }
 
-    public PullToRefreshListView(Context context, AttributeSet attrs){
+    public PullToRefreshExpandableListView(Context context, AttributeSet attrs){
         super(context, attrs);
         ptrHelper = new PullToRefreshHelper(this);
         ptrHelper.init();
     }
 
-    public PullToRefreshListView(Context context, AttributeSet attrs, int defStyle){
+    public PullToRefreshExpandableListView(Context context, AttributeSet attrs, int defStyle){
         super(context, attrs, defStyle);
         ptrHelper = new PullToRefreshHelper(this);
         ptrHelper.init();

@@ -7,7 +7,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import eu.erikw.PullToRefreshListView;
-import eu.erikw.PullToRefreshListView.OnRefreshListener;
+import eu.erikw.PullToRefreshHelper.OnRefreshListener;
 
 import java.util.ArrayList;
 
