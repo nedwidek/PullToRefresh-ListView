@@ -40,6 +40,11 @@ public class PullToRefreshHelper {
          */
         public void onRefresh();
     }
+    
+    protected interface ParentOnTouchEventListener {
+    	
+    	public boolean parentOnTouchEvent(MotionEvent event);
+    }
 
     private static final float PULL_RESISTANCE                 = 1.7f;
     private static final int   BOUNCE_ANIMATION_DURATION       = 700;
@@ -315,7 +320,7 @@ public class PullToRefreshHelper {
                 break;
         }
 
-        return listView.onTouchEvent(event);
+        return ((ParentOnTouchEventListener)listView).parentOnTouchEvent(event);
     }
 	
 	protected void onScrollChanged(int l, int t, int oldl, int oldt){
