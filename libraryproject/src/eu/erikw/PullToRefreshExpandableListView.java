@@ -10,8 +10,7 @@ import android.widget.ExpandableListView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
-public class PullToRefreshExpandableListView extends ExpandableListView 
-  		implements PullToRefreshHelper.ParentOnTouchEventListener {
+public class PullToRefreshExpandableListView extends ExpandableListView {
 	
 	PullToRefreshHelper ptrHelper;
 	
@@ -137,7 +136,11 @@ public class PullToRefreshExpandableListView extends ExpandableListView
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
-        return ptrHelper.onTouchEvent(event);
+        if(ptrHelper.onTouchEvent(event)) {
+        	return true;
+        }
+        
+        return super.onTouchEvent(event);
     }
     
     public boolean parentOnTouchEvent(MotionEvent event) {

@@ -33,7 +33,7 @@ import eu.erikw.PullToRefreshHelper.OnRefreshListener;
  * @author Erik Wallentinsen <dev+ptr@erikw.eu>
  * @version 1.0.0
  */
-public class PullToRefreshListView extends ListView implements PullToRefreshHelper.ParentOnTouchEventListener {
+public class PullToRefreshListView extends ListView {
 
     private PullToRefreshHelper ptrHelper;
 
@@ -160,11 +160,11 @@ public class PullToRefreshListView extends ListView implements PullToRefreshHelp
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
-        return ptrHelper.onTouchEvent(event);
-    }
-    
-    public boolean parentOnTouchEvent(MotionEvent event) {
-    	return super.onTouchEvent(event);
+    	if(ptrHelper.onTouchEvent(event)) {
+        	return true;
+        }
+        
+        return super.onTouchEvent(event);
     }
 
     @Override
