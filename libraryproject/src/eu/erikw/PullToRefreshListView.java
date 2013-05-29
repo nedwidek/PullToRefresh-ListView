@@ -8,6 +8,8 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.animation.*;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.*;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,18 +44,26 @@ public class PullToRefreshListView extends ListView {
         super(context);
         ptrHelper = new PullToRefreshHelper(this);
         ptrHelper.init();
+        init();
     }
 
     public PullToRefreshListView(Context context, AttributeSet attrs){
         super(context, attrs);
         ptrHelper = new PullToRefreshHelper(this);
         ptrHelper.init();
+        init();
     }
 
     public PullToRefreshListView(Context context, AttributeSet attrs, int defStyle){
         super(context, attrs, defStyle);
         ptrHelper = new PullToRefreshHelper(this);
         ptrHelper.init();
+        init();
+    }
+    
+    private void init() {
+    	super.setOnItemClickListener(new PTROnItemClickListener());
+    	super.setOnItemLongClickListener(new PTROnItemLongClickListener());
     }
 
     @Override
@@ -171,5 +181,21 @@ public class PullToRefreshListView extends ListView {
     protected void onScrollChanged(int l, int t, int oldl, int oldt){
     	super.onScrollChanged(l, t, oldl, oldt);
         ptrHelper.onScrollChanged(l, t, oldl, oldt);
+    }
+    
+    private class PTROnItemClickListener implements OnItemClickListener{
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id){
+            ptrHelper.doItemClick(adapterView, view, position, id);
+        }
+    }
+
+    private class PTROnItemLongClickListener implements OnItemLongClickListener{
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id){
+            return ptrHelper.doItemLongClick(adapterView, view, position, id);
+        }
     }
 }

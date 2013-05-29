@@ -17,6 +17,11 @@ import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.AdapterView;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ExpandableListView.OnGroupClickListener;
+import android.widget.ExpandableListView.OnGroupCollapseListener;
+import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -81,8 +86,13 @@ public class PullToRefreshHelper {
     private OnItemClickListener     onItemClickListener;
     private OnItemLongClickListener onItemLongClickListener;
     private OnRefreshListener       onRefreshListener;
+    private OnChildClickListener	onChildClickListener;
+    private OnGroupClickListener	onGroupClickListener;
+    private OnGroupCollapseListener	onGroupCollapseListener;
+    private OnGroupExpandListener	onGroupExpandListener;
     
     private ListView                listView;
+    private boolean					isExpandableListView = false;
     
     public PullToRefreshHelper(PullToRefreshListView listView) {
     	this.listView = listView;
@@ -93,6 +103,11 @@ public class PullToRefreshHelper {
     }
     
 	protected void init(){
+		
+		if(listView.getClass() == PullToRefreshExpandableListView.class) {
+			isExpandableListView = true;
+		}
+		
         listView.setVerticalFadingEdgeEnabled(false);
 
         headerContainer = (LinearLayout) LayoutInflater.from(listView.getContext()).inflate(R.layout.ptr_header, null);
@@ -123,9 +138,6 @@ public class PullToRefreshHelper {
 
         ViewTreeObserver vto = header.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new PTROnGlobalLayoutListener());
-
-        listView.setOnItemClickListener(new PTROnItemClickListener());
-        listView.setOnItemLongClickListener(new PTROnItemLongClickListener());
     }
 	
 	
@@ -139,6 +151,22 @@ public class PullToRefreshHelper {
 
     public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener){
         this.onItemLongClickListener = onItemLongClickListener;
+    }
+    
+    public void setOnChildClickListener(OnChildClickListener onChildClickListener){
+        this.onChildClickListener = onChildClickListener;
+    }
+    
+    public void setOnGroupClickListener(OnGroupClickListener onGroupClickListener){
+        this.onGroupClickListener = onGroupClickListener;
+    }
+    
+    public void setOnGroupCollapseListener(OnGroupCollapseListener onGroupCollapseListener){
+        this.onGroupCollapseListener = onGroupCollapseListener;
+    }
+    
+    public void setOnGroupExpandListener(OnGroupExpandListener onGroupExpandListener){
+        this.onGroupExpandListener = onGroupExpandListener;
     }
 
     /**
@@ -405,8 +433,69 @@ public class PullToRefreshHelper {
                 break;
         }
     }
+    
+    protected void doItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+    	hasResetHeader = false;
 
-	
+        if(onItemClickListener != null && state == State.PULL_TO_REFRESH){
+            // Passing up onItemClick. Correct position with the number of header views
+            onItemClickListener.onItemClick(adapterView, view, position - listView.getHeaderViewsCount(), id);
+        }
+    }
+    
+    protected boolean doItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+    	hasResetHeader = false;
+
+        if(onItemLongClickListener != null && state == State.PULL_TO_REFRESH){
+            // Passing up onItemLongClick. Correct position with the number of header views
+            return onItemLongClickListener.onItemLongClick(adapterView, view, position - listView.getHeaderViewsCount(), id);
+        }
+
+        return false;
+    }
+    
+    protected boolean doChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+    	hasResetHeader = false;
+
+    	if(onChildClickListener != null) android.util.Log.d("doChildClick", "listener is not null");
+    	if(state == State.PULL_TO_REFRESH) android.util.Log.d("doChildClick", "State is pull to refresh");
+    	
+        if(onChildClickListener != null && state == State.PULL_TO_REFRESH){
+            // Passing up onItemLongClick. Correct position with the number of header views
+            return onChildClickListener.onChildClick(parent, v, groupPosition, childPosition, id);
+        }
+
+        return false;
+    }
+    
+    protected boolean doGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+    	hasResetHeader = false;
+    	
+    	if(onGroupClickListener != null) android.util.Log.d("doGroupClick", "listener is not null");
+    	if(state == State.PULL_TO_REFRESH) android.util.Log.d("doGroupClick", "State is pull to refresh");
+    	
+    	if(onGroupClickListener != null && state == State.PULL_TO_REFRESH) {
+    		return onGroupClickListener.onGroupClick(parent, v, groupPosition, id);
+    	}
+    	return false;
+    }
+    
+    protected void doGroupCollapse(int groupPosition) {
+    	hasResetHeader = false;
+    	
+    	if(onGroupCollapseListener != null && state == State.PULL_TO_REFRESH) {
+    		onGroupCollapseListener.onGroupCollapse(groupPosition);
+    	}
+    }
+    
+    protected void doGroupExpand(int groupPosition) {
+    	hasResetHeader = false;
+    	
+    	if(onGroupExpandListener != null && state == State.PULL_TO_REFRESH) {
+    		onGroupExpandListener.onGroupExpand(groupPosition);
+    	}
+    }
+
 	private class HeaderAnimationListener implements AnimationListener{
 
         private int height, translation;
@@ -478,34 +567,6 @@ public class PullToRefreshHelper {
             }
 
             listView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-        }
-    }
-
-    private class PTROnItemClickListener implements OnItemClickListener{
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id){
-            hasResetHeader = false;
-
-            if(onItemClickListener != null && state == State.PULL_TO_REFRESH){
-                // Passing up onItemClick. Correct position with the number of header views
-                onItemClickListener.onItemClick(adapterView, view, position - listView.getHeaderViewsCount(), id);
-            }
-        }
-    }
-
-    private class PTROnItemLongClickListener implements OnItemLongClickListener{
-
-        @Override
-        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id){
-            hasResetHeader = false;
-
-            if(onItemLongClickListener != null && state == State.PULL_TO_REFRESH){
-                // Passing up onItemLongClick. Correct position with the number of header views
-                return onItemLongClickListener.onItemLongClick(adapterView, view, position - listView.getHeaderViewsCount(), id);
-            }
-
-            return false;
         }
     }
 }

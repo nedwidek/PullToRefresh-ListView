@@ -6,6 +6,8 @@ import eu.erikw.PullToRefreshHelper.OnRefreshListener;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -18,18 +20,31 @@ public class PullToRefreshExpandableListView extends ExpandableListView {
         super(context);
         ptrHelper = new PullToRefreshHelper(this);
         ptrHelper.init();
+        init();
     }
 
     public PullToRefreshExpandableListView(Context context, AttributeSet attrs){
         super(context, attrs);
         ptrHelper = new PullToRefreshHelper(this);
         ptrHelper.init();
+        init();
     }
 
     public PullToRefreshExpandableListView(Context context, AttributeSet attrs, int defStyle){
         super(context, attrs, defStyle);
         ptrHelper = new PullToRefreshHelper(this);
         ptrHelper.init();
+        init();
+    }
+    
+    private void init() {
+    	super.setOnItemClickListener(new PTROnItemClickListener());
+    	super.setOnItemLongClickListener(new PTROnItemLongClickListener());
+    	super.setOnChildClickListener(new PTROnChildClickListener());
+    	super.setOnGroupClickListener(new PTROnGroupClickListener());
+    	super.setOnGroupCollapseListener(new PTROnGroupCollapseListener());
+    	super.setOnGroupExpandListener(new PTROnGroupExpandListener());
+    	
     }
 
     @Override
@@ -40,6 +55,26 @@ public class PullToRefreshExpandableListView extends ExpandableListView {
     @Override
     public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener){
         ptrHelper.setOnItemLongClickListener(getOnItemLongClickListener());
+    }
+    
+    @Override
+    public void setOnChildClickListener(OnChildClickListener onChildClickListener){
+        ptrHelper.setOnChildClickListener(onChildClickListener);
+    }
+    
+    @Override
+    public void setOnGroupClickListener(OnGroupClickListener onGroupClickListener){
+        ptrHelper.setOnGroupClickListener(onGroupClickListener);
+    }
+    
+    @Override
+    public void setOnGroupCollapseListener(OnGroupCollapseListener onGroupCollapseListener){
+        ptrHelper.setOnGroupCollapseListener(onGroupCollapseListener);
+    }
+    
+    @Override
+    public void setOnGroupExpandListener(OnGroupExpandListener onGroupExpandListener){
+        ptrHelper.setOnGroupExpandListener(onGroupExpandListener);
     }
 
     /**
@@ -151,5 +186,59 @@ public class PullToRefreshExpandableListView extends ExpandableListView {
     protected void onScrollChanged(int l, int t, int oldl, int oldt){
     	super.onScrollChanged(l, t, oldl, oldt);
         ptrHelper.onScrollChanged(l, t, oldl, oldt);
+    }
+    
+    
+    
+    private class PTROnItemClickListener implements OnItemClickListener{
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id){
+            ptrHelper.doItemClick(adapterView, view, position, id);
+        }
+    }
+
+    private class PTROnItemLongClickListener implements OnItemLongClickListener{
+
+        @Override
+        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id){
+            return ptrHelper.doItemLongClick(adapterView, view, position, id);
+        }
+    }
+    
+    private class PTROnChildClickListener implements ExpandableListView.OnChildClickListener {
+
+		@Override
+		public boolean onChildClick(ExpandableListView parent, View v,
+				int groupPosition, int childPosition, long id) {
+			return ptrHelper.doChildClick(parent, v, groupPosition, childPosition, id);
+		}
+    } 
+    
+    private class PTROnGroupClickListener implements ExpandableListView.OnGroupClickListener {
+
+		@Override
+		public boolean onGroupClick(ExpandableListView parent, View v,
+				int groupPosition, long id) {
+			return ptrHelper.doGroupClick(parent, v, groupPosition, id);
+		}
+    }
+    
+    private class PTROnGroupCollapseListener implements ExpandableListView.OnGroupCollapseListener {
+
+		@Override
+		public void onGroupCollapse(int groupPosition) {
+			ptrHelper.doGroupCollapse(groupPosition);
+			
+		}
+    }
+    
+    private class PTROnGroupExpandListener implements ExpandableListView.OnGroupExpandListener {
+
+		@Override
+		public void onGroupExpand(int groupPosition) {
+			ptrHelper.doGroupExpand(groupPosition);
+			
+		}
     }
 }
